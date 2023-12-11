@@ -16,34 +16,13 @@ class TimReader {
     this._images = [];
   }
 
-  createCanvas(imageIndex = 0) {
-    const data = this._images[imageIndex];
-
-    const canvas = document.createElement("canvas");
-    canvas.width = data.imageWidth;
-    canvas.height = data.imageHeight;
-
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < data.imageColors.length; i++) {
-      ["r", "g", "b"].forEach((key, index) => {
-        imageData.data[index + i * 4] = data.imageColors[i][key];
-      });
-      imageData.data[3 + i * 4] = 255;
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-
-    return canvas;
-  }
-
   readArrayBuffer(arrayBuffer) {
     this._uint32Array = new Uint32Array(arrayBuffer);
     this._parse();
   }
 
-  get length() {
-    return this._images.length;
+  get images() {
+    return this._images;
   }
 
   _read(bits = 32) {
@@ -63,10 +42,59 @@ class TimReader {
     this._pointer = 0;
   }
 
+  _readColors(length, bpp, clp) {
+    const colors = [];
+    for (let i = 0; i < length; i++) {
+      switch (bpp) {
+        case TimReader.BPP_4_BIT:
+          colors.push(clp[this._read(4)]);
+          break;
+        case TimReader.BPP_8_BIT:
+          colors.push(clp[this._read(8)]);
+          break;
+        case TimReader.BPP_16_BIT:
+          colors.push({
+            r: (this._read(5) * 527 + 23) >> 6,
+            g: (this._read(5) * 527 + 23) >> 6,
+            b: (this._read(5) * 527 + 23) >> 6,
+            stp: this._read(1),
+          });
+          break;
+        case TimReader.BPP_24_BIT:
+          colors.push({
+            r: this._read(8),
+            g: this._read(8),
+            b: this._read(8),
+          });
+          break;
+      }
+    }
+    return colors;
+  }
+
+  _createCanvas(image) {
+    const canvas = document.createElement("canvas");
+    canvas.width = image.imageWidth;
+    canvas.height = image.imageHeight;
+
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < image.imageColors.length; i++) {
+      ["r", "g", "b"].forEach((key, index) => {
+        imageData.data[index + i * 4] = image.imageColors[i][key];
+      });
+      imageData.data[3 + i * 4] = 255;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    return canvas;
+  }
+
   _parse() {
     this._rewind();
 
-    this._images.splice(0, this._images.length);
+    this._images = [];
 
     while (this._read(8) === TimReader.TYPE_TIM) {
       const image = {};
@@ -108,38 +136,8 @@ class TimReader {
 
       image.imageColors = this._readColors(image.imageWidth * image.imageWidth, image.bpp, image.clutColors);
 
-      this._images.push(image);
+      this._images.push(this._createCanvas(image));
     }
-  }
-
-  _readColors(length, bpp, clp) {
-    const colors = [];
-    for (let i = 0; i < length; i++) {
-      switch (bpp) {
-        case TimReader.BPP_4_BIT:
-          colors.push(clp[this._read(4)]);
-          break;
-        case TimReader.BPP_8_BIT:
-          colors.push(clp[this._read(8)]);
-          break;
-        case TimReader.BPP_16_BIT:
-          colors.push({
-            r: (this._read(5) * 527 + 23) >> 6,
-            g: (this._read(5) * 527 + 23) >> 6,
-            b: (this._read(5) * 527 + 23) >> 6,
-            stp: this._read(1),
-          });
-          break;
-        case TimReader.BPP_24_BIT:
-          colors.push({
-            r: this._read(8),
-            g: this._read(8),
-            b: this._read(8),
-          });
-          break;
-      }
-    }
-    return colors;
   }
 }
 
