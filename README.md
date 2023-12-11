@@ -10,7 +10,7 @@ The class provides the following methods and properties:
 
 | Property | Description                    |
 | -------- | ------------------------------ |
-| `images` | Canvas elements of all images. |
+| `images` | Array with canvas elements of all images. |
 
 ## Examples
 
