@@ -80,3 +80,7 @@ for (let i = 0; i < timReader.length; i++) {
     document.body.appendChild(canvas);
 }
 ```
+
+## Thanks to
+
+[rawunprotected](https://github.com/rawrunprotected) - For the "[Fast and Accurate Color Depth Conversion](https://threadlocalmutex.com/?p=48)"
