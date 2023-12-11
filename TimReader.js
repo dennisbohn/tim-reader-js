@@ -68,7 +68,7 @@ class TimReader {
 
     this._images.splice(0, this._images.length);
 
-    while (this._read(8) === 16) {
+    while (this._read(8) === TimReader.TYPE_TIM) {
       const image = {};
 
       image.version = this._read(8);
@@ -144,6 +144,7 @@ class TimReader {
 }
 
 // Define constants
+TimReader.TYPE_TIM = 16;
 TimReader.BPP_4_BIT = 0;
 TimReader.BPP_8_BIT = 1;
 TimReader.BPP_16_BIT = 2;
