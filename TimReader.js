@@ -47,7 +47,7 @@ class TimReader {
   }
 
   _read(bits = 32) {
-    const block = Math.floor(this._pointer / 32);
+    const block = this._pointer >>> 5;
     const offset = this._pointer % 32;
     const bitmask = (1 << bits) - 1 || 0xffffffff;
     const data = (this._uint32Array[block] >> offset) & bitmask;
@@ -124,9 +124,9 @@ class TimReader {
           break;
         case TimReader.BPP_16_BIT:
           colors.push({
-            r: Math.round((this._read(5) / 0x1f) * 0xff),
-            g: Math.round((this._read(5) / 0x1f) * 0xff),
-            b: Math.round((this._read(5) / 0x1f) * 0xff),
+            r: (this._read(5) * 527 + 23) >> 6,
+            g: (this._read(5) * 527 + 23) >> 6,
+            b: (this._read(5) * 527 + 23) >> 6,
             stp: this._read(1),
           });
           break;
