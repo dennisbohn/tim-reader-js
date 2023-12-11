@@ -7,7 +7,6 @@ The class provides the following methods and properties:
 | Method                         | Description                             |
 | ------------------------------ | --------------------------------------- |
 | `readArrayBuffer(arrayBuffer)` | Reads the TIM file from an ArrayBuffer. |
-| `createCanvas()`               | Creates a canvas element for the DOM.   |
 
 | Property | Description                    |
 | -------- | ------------------------------ |
