@@ -108,8 +108,6 @@ class TimReader {
 
       image.imageColors = this._readColors(image.imageWidth * image.imageWidth, image.bpp, image.clutColors);
 
-      console.log(image);
-
       this._images.push(image);
     }
   }
